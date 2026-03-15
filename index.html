@@ -6,12 +6,48 @@
     <title>雅思词汇闪卡 - 旗舰版</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
+        /* --- CSS 变量定义主题色 --- */
+        :root {
+            --primary-color: var(--primary-color);
+            --primary-light: var(--primary-light);
+            --primary-dark: var(--primary-dark);
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+
+        /* 主题色：天空蓝 */
+        body.theme-blue {
+            --primary-color: #3498db;
+            --primary-light: #74b9ff;
+            --primary-dark: #2980b9;
+            --gradient-start: #3498db;
+            --gradient-end: #2980b9;
+        }
+
+        /* 主题色：薄荷绿 */
+        body.theme-green {
+            --primary-color: #00b894;
+            --primary-light: #55efc4;
+            --primary-dark: #00a085;
+            --gradient-start: #00b894;
+            --gradient-end: #00a085;
+        }
+
+        /* 主题色：活力橙 */
+        body.theme-orange {
+            --primary-color: #e67e22;
+            --primary-light: #fab1a0;
+            --primary-dark: #d35400;
+            --gradient-start: #e67e22;
+            --gradient-end: #d35400;
+        }
+
         /* --- 基础样式 --- */
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; flex-direction: row; height: 100vh; margin: 0; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            overflow: hidden; 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; flex-direction: row; height: 100vh; margin: 0;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            overflow: hidden;
             transition: background 0.3s ease;
         }
         
@@ -47,7 +83,7 @@
         #category-select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; color: #2d3436; font-size: 14px; outline: none; transition: all 0.3s; }
 
         #side-menu a { padding: 18px 25px; text-decoration: none; color: #2d3436; font-size: 16px; font-weight: bold; border-bottom: 1px solid #f1f2f6; transition: 0.2s; }
-        #side-menu a:hover { background: #f8f9fa; color: #6c5ce7; padding-left: 30px; }
+        #side-menu a:hover { background: #f8f9fa; color: var(--primary-color); padding-left: 30px; }
         
         #main-area { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; height: 100vh; overflow: hidden; transition: width 0.3s ease; }
 
@@ -77,7 +113,7 @@
 
         /* 当侧边栏打开时，如果是白底，让汉堡按钮变紫 */
         #side-menu.open ~ #main-area #menu-btn {
-            color: #6c5ce7; 
+            color: var(--primary-color); 
             background: rgba(108, 92, 231, 0.1); /* 给一点淡紫色的半透明底座 */
         }
 
@@ -122,24 +158,24 @@
             }
         }
 
-        #welcome-screen h1 { color: #6c5ce7; font-size: 36px; margin-bottom: 10px; transition: color 0.3s; }
+        #welcome-screen h1 { color: var(--primary-color); font-size: 36px; margin-bottom: 10px; transition: color 0.3s; }
         #welcome-screen p { color: #636e72; font-size: 16px; margin-bottom: 30px; line-height: 1.6; }
-        .highlight-text { color: #a29bfe; font-weight: bold; font-size: 18px; }
-        #stats { font-size: 14px; color: #a29bfe; margin-bottom: 15px; font-weight: bold; }
+        .highlight-text { color: var(--primary-light); font-weight: bold; font-size: 18px; }
+        #stats { font-size: 14px; color: var(--primary-light); margin-bottom: 15px; font-weight: bold; }
         
         #flashcard-screen h1 { color: #2d3436; font-size: 42px; margin: 10px 0; letter-spacing: 1px; transition: color 0.3s;}
         
         #phonetic-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; min-height: 24px; flex-wrap: wrap; }
-        #phonetic { color: #6c5ce7; font-size: 1.2rem; }
+        #phonetic { color: var(--primary-color); font-size: 1.2rem; }
         
-        .pos-badge { background: #a29bfe; color: white; padding: 2px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; display: inline-block; }
+        .pos-badge { background: var(--primary-light); color: white; padding: 2px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; display: inline-block; }
 
-        #current-category-badge { display: inline-block; font-size: 12px; color: #a29bfe; border: 1px solid #a29bfe; padding: 2px 8px; border-radius: 20px; margin-bottom: 15px; align-self: center; }
+        #current-category-badge { display: inline-block; font-size: 12px; color: var(--primary-light); border: 1px solid var(--primary-light); padding: 2px 8px; border-radius: 20px; margin-bottom: 15px; align-self: center; }
 
         #meaning { color: #636e72; font-size: 18px; min-height: 100px; margin-bottom: 30px; cursor: pointer; padding: 15px; border: 1px dashed #dfe6e9; border-radius: 10px; display: flex; align-items: center; justify-content: center; white-space: pre-wrap; overflow-y: auto; transition: all 0.3s; }
         
         #list-screen { display: none; padding: 30px 20px; width: 90%; max-width: 450px; text-align: left; max-height: 75vh; overflow: hidden; flex-direction: column; }
-        #list-title { color: #6c5ce7; font-size: 24px; margin-top: 0; margin-bottom: 15px; text-align: center; transition: color 0.3s;}
+        #list-title { color: var(--primary-color); font-size: 24px; margin-top: 0; margin-bottom: 15px; text-align: center; transition: color 0.3s;}
         
         #list-filters { display: flex; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid #f1f2f6; justify-content: center; transition: border-color 0.3s;}
         .filter-select { padding: 6px; border-radius: 6px; border: 1px solid #dfe6e9; color: #636e72; font-size: 13px; outline: none; background: #f8f9fa; cursor: pointer; transition: all 0.3s;}
@@ -149,7 +185,7 @@
         .list-word { font-weight: bold; color: #2d3436; font-size: 18px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; transition: color 0.3s;}
         .list-meaning { color: #636e72; font-size: 14px; margin-top: 5px; transition: color 0.3s;}
         
-        button { background: #6c5ce7; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: transform 0.2s; width: 100%; flex-shrink: 0; }
+        button { background: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: transform 0.2s; width: 100%; flex-shrink: 0; }
         button:active { transform: scale(0.95); }
         #controls { display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
         #flashcard-screen { display: none; }
@@ -226,6 +262,15 @@
         <a href="#" onclick="showList('learned')">✅ 已背诵单词</a>
         <a href="#" onclick="showList('unlearned')">⏳ 未背诵单词</a>
         <a href="#" onclick="showStatus()">📈 学习进度</a>
+        <div class="category-selector-container" style="margin-top: 10px;">
+            <label>🎨 主题色：</label>
+            <select id="theme-select" onchange="changeTheme()">
+                <option value="purple">🟣 紫罗兰</option>
+                <option value="blue">🔵 天空蓝</option>
+                <option value="green">🟢 薄荷绿</option>
+                <option value="orange">🟠 活力橙</option>
+            </select>
+        </div>
         <a href="#" onclick="toggleDarkMode()">🌙 / ☀️ 夜间模式</a>
         <a href="#" onclick="backupProgress()">📥 备份进度 (导出 JSON)</a>
         <a href="#" onclick="document.getElementById('import-file').click()">📤 恢复进度 (导入 JSON)</a>
@@ -252,7 +297,7 @@
                 <span id="phonetic"></span>
                 <div id="pos-container" style="display: flex; gap: 5px;"></div>
             </div>
-            <button onclick="speakCurrentWord()" style="background: none; border: 1px solid #6c5ce7; color: #6c5ce7; padding: 5px 15px; font-size: 12px; margin-bottom: 15px; width: auto; box-shadow: none;">🔊 再次发音</button>
+            <button onclick="speakCurrentWord()" style="background: none; border: 1px solid var(--primary-color); color: var(--primary-color); padding: 5px 15px; font-size: 12px; margin-bottom: 15px; width: auto; box-shadow: none;">🔊 再次发音</button>
             <div id="meaning">点击看释义</div>
             <div id="controls">
                 <button onclick="handleRate(1)" style="background: #ff7675; font-size: 14px;">生疏 (1d)</button>
@@ -294,7 +339,7 @@
 
         <!-- 进度面板 -->
         <div id="status-screen" class="card-container" style="display: none; padding: 30px 20px; width: 90%; max-width: 450px; text-align: left; overflow-y: auto;">
-            <h2 id="status-title" style="color: #6c5ce7; text-align: center; margin-top: 0; margin-bottom: 25px;">📊 学习进度</h2>
+            <h2 id="status-title" style="color: var(--primary-color); text-align: center; margin-top: 0; margin-bottom: 25px;">📊 学习进度</h2>
 
             <div style="margin-bottom: 30px;">
                 <h3 class="progress-title">🏆 总进度</h3>
@@ -303,7 +348,7 @@
                     <span id="overall-progress-percent">0%</span>
                 </div>
                 <div class="progress-bar-bg">
-                    <div id="overall-progress-fill" class="progress-bar-fill" style="background: linear-gradient(90deg, #6c5ce7, #a29bfe);"></div>
+                    <div id="overall-progress-fill" class="progress-bar-fill" style="background: linear-gradient(90deg, var(--primary-color), var(--primary-light));"></div>
                 </div>
             </div>
 
@@ -357,20 +402,35 @@
         }
 
         function initDarkMode() {
-    const savedMode = localStorage.getItem('ielts_dark_mode');
-    
-    // 如果用户手动设过（true/false），就按手动来
-    if (savedMode !== null) {
-        if (savedMode === 'true') document.body.classList.add('dark-mode');
-    } 
-    // 如果用户没设过，就看系统是不是深色模式
-    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.body.classList.add('dark-mode');
-    }
-}
+            const savedMode = localStorage.getItem('ielts_dark_mode');
+
+            // 如果用户手动设过（true/false），就按手动来
+            if (savedMode !== null) {
+                if (savedMode === 'true') document.body.classList.add('dark-mode');
+            }
+        }
+
+        // 主题色切换
+        function changeTheme() {
+            const theme = document.getElementById('theme-select').value;
+            document.body.classList.remove('theme-blue', 'theme-green', 'theme-orange');
+            if (theme !== 'purple') {
+                document.body.classList.add(`theme-${theme}`);
+            }
+            localStorage.setItem('ielts_theme', theme);
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('ielts_theme') || 'purple';
+            document.getElementById('theme-select').value = savedTheme;
+            if (savedTheme !== 'purple') {
+                document.body.classList.add(`theme-${savedTheme}`);
+            }
+        }
 
         function initCategories() {
-            initDarkMode(); 
+            initDarkMode();
+            initTheme(); 
             
             const allWords = window.ieltsWords || [];
             const categories = [...new Set(allWords.map(w => w.category).filter(c => c))];
@@ -553,7 +613,7 @@
                 }
                 content.innerHTML += `
                     <div class="list-item">
-                        <div class="list-word"><span>${w.word}</span><div style="display:flex; gap:2px; flex-wrap:wrap;">${posBadgesHTML}</div><span style="font-size:13px; color:#a29bfe; font-weight:normal; margin-left: 4px;">${w.phonetic || ''}</span>${memoryBadgeHTML}</div>
+                        <div class="list-word"><span>${w.word}</span><div style="display:flex; gap:2px; flex-wrap:wrap;">${posBadgesHTML}</div><span style="font-size:13px; color:var(--primary-light); font-weight:normal; margin-left: 4px;">${w.phonetic || ''}</span>${memoryBadgeHTML}</div>
                         <div class="list-meaning">${w.meaning}</div>
                     </div>`;
             });
