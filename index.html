@@ -627,7 +627,7 @@
                     const record = wordData[w.word];
                     if (record && record.level && levelStyleMap[record.level]) {
                         const styleInfo = levelStyleMap[record.level];
-                        memoryBadgeHTML = `<span style="border: 1px solid ${styleInfo.color}; color: ${styleInfo.color}; padding: 1px 5px; border-radius: 4px; font-size: 10px; margin-left: auto;">${styleInfo.text}</span>`;
+                        memoryBadgeHTML = `<span onclick="changeWordLevel('${w.word}', event)" style="border: 1px solid ${styleInfo.color}; color: ${styleInfo.color}; padding: 1px 5px; border-radius: 4px; font-size: 10px; margin-left: auto; cursor: pointer; user-select: none;" title="点击修改熟练度">${styleInfo.text}</span>`;
                     }
                 }
                 content.innerHTML += `
@@ -671,6 +671,49 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        // 在列表中修改单词熟练度
+        function changeWordLevel(word, event) {
+            event.stopPropagation();
+            const record = wordData[word];
+            if (!record) return;
+
+            const currentLevel = record.level;
+            const levels = [
+                { value: 1, text: '生疏', days: 1 },
+                { value: 2, text: '模糊', days: 2 },
+                { value: 3, text: '熟悉', days: 4 },
+                { value: 5, text: '简单', days: 7 }
+            ];
+
+            let options = levels.map(l => `${l.value}. ${l.text} (${l.days}天)`).join('\n');
+            const choice = prompt(`修改 "${word}" 的熟练度:\n${options}\n\n当前: ${levelStyleMap[currentLevel]?.text || '未知'}`, currentLevel);
+
+            if (choice === null) return; // 用户取消
+
+            const newLevel = parseInt(choice);
+            if (![1, 2, 3, 5].includes(newLevel)) {
+                alert('请输入 1、2、3 或 5');
+                return;
+            }
+
+            // 更新单词数据
+            const days = newLevel === 1 ? 1 : newLevel === 2 ? 2 : newLevel === 3 ? 4 : 7;
+            const nextReview = new Date();
+            nextReview.setDate(nextReview.getDate() + days);
+            nextReview.setHours(5, 0, 0, 0);
+
+            wordData[word] = {
+                ...record,
+                level: newLevel,
+                nextReview: nextReview.getTime(),
+                lastReviewed: Date.now()
+            };
+            localStorage.setItem('ielts_word_data', JSON.stringify(wordData));
+
+            // 刷新列表
+            applyFilters();
         }
 
         function speakCurrentWord() {
