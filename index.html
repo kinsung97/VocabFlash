@@ -681,24 +681,47 @@
 
             const currentLevel = record.level;
             const levels = [
-                { value: 1, text: '生疏', days: 1 },
-                { value: 2, text: '模糊', days: 2 },
-                { value: 3, text: '熟悉', days: 4 },
-                { value: 5, text: '简单', days: 7 }
+                { value: 1, text: '生疏', days: 1, color: '#ff7675' },
+                { value: 2, text: '模糊', days: 2, color: '#fdcb6e' },
+                { value: 3, text: '熟悉', days: 4, color: '#55efc4' },
+                { value: 5, text: '简单', days: 7, color: '#00cec9' }
             ];
 
-            let options = levels.map(l => `${l.value}. ${l.text} (${l.days}天)`).join('\n');
-            const choice = prompt(`修改 "${word}" 的熟练度:\n${options}\n\n当前: ${levelStyleMap[currentLevel]?.text || '未知'}`, currentLevel);
+            // 创建自定义弹窗
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2000;display:flex;justify-content:center;align-items:center;';
 
-            if (choice === null) return; // 用户取消
+            const popup = document.createElement('div');
+            popup.style.cssText = 'background:white;padding:25px;border-radius:15px;min-width:280px;max-width:90%;box-shadow:0 10px 40px rgba(0,0,0,0.3);';
 
-            const newLevel = parseInt(choice);
-            if (![1, 2, 3, 5].includes(newLevel)) {
-                alert('请输入 1、2、3 或 5');
-                return;
-            }
+            let buttonsHtml = levels.map(l => {
+                const isCurrent = l.value === currentLevel;
+                return `<button onclick="confirmLevelChange('${word}', ${l.value})" style="width:100%;margin:8px 0;padding:12px;border:2px solid ${l.color};background:${isCurrent ? l.color : 'white'};color:${isCurrent ? 'white' : l.color};border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer;transition:all 0.2s;">
+                    ${l.text} (${l.days}天) ${isCurrent ? '✓ 当前' : ''}
+                </button>`;
+            }).join('');
 
-            // 更新单词数据
+            popup.innerHTML = `
+                <h3 style="margin:0 0 20px 0;color:#2d3436;text-align:center;font-size:18px;">修改 "${word}" 熟练度</h3>
+                <div style="display:flex;flex-direction:column;">${buttonsHtml}</div>
+                <button onclick="closeLevelPopup()" style="width:100%;margin-top:15px;padding:10px;background:#dfe6e9;color:#636e72;border:none;border-radius:8px;cursor:pointer;">取消</button>
+            `;
+
+            overlay.appendChild(popup);
+            overlay.id = 'level-popup-overlay';
+            document.body.appendChild(overlay);
+        }
+
+        function closeLevelPopup() {
+            const overlay = document.getElementById('level-popup-overlay');
+            if (overlay) overlay.remove();
+        }
+
+        function confirmLevelChange(word, newLevel) {
+            closeLevelPopup();
+            const record = wordData[word];
+            if (!record) return;
+
             const days = newLevel === 1 ? 1 : newLevel === 2 ? 2 : newLevel === 3 ? 4 : 7;
             const nextReview = new Date();
             nextReview.setDate(nextReview.getDate() + days);
@@ -711,8 +734,6 @@
                 lastReviewed: Date.now()
             };
             localStorage.setItem('ielts_word_data', JSON.stringify(wordData));
-
-            // 刷新列表
             applyFilters();
         }
 
