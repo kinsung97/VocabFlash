@@ -1,4 +1,4 @@
-# # 雅思词汇闪卡 (IELTS Vocabulary Flashcards) 🚀
+# 雅思词汇闪卡 (IELTS Vocabulary Flashcards) 🚀
 
 一个简洁、优雅且高效的雅思词汇背诵工具。专为备考雅思的同学设计，基于艾宾浩斯遗忘曲线原理（简易版），通过闪卡（Flashcards）形式帮助你快速斩获核心词汇。
 
@@ -26,13 +26,13 @@
 
 ### 方案 A：本地运行（最简单）
 
-1. 点击 [Download ZIP](https://www.google.com/search?q=https://github.com/%E4%BD%A0%E7%9A%84%E7%94%A8%E6%88%B7%E5%90%8D/%E4%BD%A0%E7%9A%84%E4%BB%93%E5%BA%93%E5%90%8D/archive/refs/heads/main.zip) 下载并解压。
+1. 点击 [Download ZIP](https://github.com/kinsung97/IELTS-Vocab/archive/refs/heads/main.zip) 下载并解压。
 2. 双击文件夹中的 `index.html`，即可在浏览器中开始使用。
 
 ### 方案 B：在线访问（推荐）
 
 本仓库已开启 **GitHub Pages** 自动部署。你可以通过以下网址直接访问：
-👉 `https://你的用户名.github.io/你的仓库名/`
+👉 https://kinsung97.github.io/IELTS-Vocab/
 
 ## 📖 使用指南
 
@@ -44,10 +44,14 @@
 
 
 3. **备份数据**：
-* 建议每周通过侧边栏点击 **“备份进度”** 下载 JSON 文件。
-* 如需换电脑，点击 **“恢复进度”** 上传该 JSON 文件即可。
+* 建议每周通过侧边栏点击 **"备份进度"** 下载 JSON 文件。
+* 如需换电脑，点击 **"恢复进度"** 上传该 JSON 文件即可。
 
+## 📚 数据来源
 
+词汇数据来自 [hefengxian/my-ielts](https://github.com/hefengxian/my-ielts) 项目，包含《雅思词汇真经》等优质雅思备考资料。
+
+感谢原作者的整理和分享！
 
 ## 📦 目录结构
 
@@ -72,7 +76,7 @@
 
 ## 📄 许可证
 
-本项目采用 [MIT License](https://www.google.com/search?q=LICENSE) 许可协议。
+本项目采用 [MIT License](LICENSE) 许可协议。
 
 ---
 
