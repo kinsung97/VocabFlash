@@ -515,21 +515,39 @@
             const allWords = window.ieltsWords || [];
             let categoryWords = currentCategory === 'all' ? allWords : allWords.filter(w => w.category === currentCategory);
 
-            let dueWords = categoryWords.filter(w => {
+            // 分离到期单词：优先复习生疏(1天)的词
+            let level1Words = []; // 生疏 - 最优先
+            let otherDueWords = []; // 其他到期单词
+
+            categoryWords.forEach(w => {
                 const record = wordData[w.word];
-                return !record || record.nextReview <= now;
+                if (!record || record.nextReview <= now) {
+                    if (record && record.level === 1) {
+                        level1Words.push(w); // 生疏的词优先
+                    } else {
+                        otherDueWords.push(w);
+                    }
+                }
             });
+
+            // 合并：生疏的词排在前面
+            let dueWords = [...level1Words, ...otherDueWords];
 
             document.getElementById('review-count').innerText = dueWords.length;
 
             if (dueWords.length === 0) {
                 document.getElementById('word').innerText = "All Done!"; document.getElementById('phonetic').innerText = "";
-                document.getElementById('pos-container').innerHTML = ''; 
+                document.getElementById('pos-container').innerHTML = '';
                 document.getElementById('meaning').innerText = `本分类下今日任务已完成 🎉\n可以切换其他词库继续！`;
                 document.getElementById('controls').style.display = 'none'; return;
             }
 
-            currentWord = dueWords[Math.floor(Math.random() * dueWords.length)];
+            // 优先从生疏的词里选，没有才从其他到期词里随机选
+            if (level1Words.length > 0) {
+                currentWord = level1Words[Math.floor(Math.random() * level1Words.length)];
+            } else {
+                currentWord = otherDueWords[Math.floor(Math.random() * otherDueWords.length)];
+            }
             document.getElementById('word').innerText = currentWord.word; document.getElementById('phonetic').innerText = currentWord.phonetic || "";
             
             const posContainer = document.getElementById('pos-container'); posContainer.innerHTML = ''; 
