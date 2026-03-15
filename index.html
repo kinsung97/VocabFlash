@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>雅思词汇闪卡 - 旗舰版</title>
     <style>
         /* --- 基础样式 --- */
@@ -10,17 +11,28 @@
             display: flex; flex-direction: row; height: 100vh; margin: 0; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
             overflow: hidden; 
-            /* 新增：让背景色切换更丝滑 */
             transition: background 0.3s ease;
         }
         
+        /* 电脑端默认的侧边栏样式 */
         #side-menu { 
             width: 280px; height: 100vh; background: white; 
             box-shadow: 2px 0 15px rgba(0,0,0,0.2); transition: margin-left 0.3s ease, background 0.3s ease; 
             margin-left: -280px; display: flex; flex-direction: column; 
-            padding-top: 20px; flex-shrink: 0; z-index: 1001; overflow-y: auto;
+            padding-top: 20px; flex-shrink: 0; z-index: 1003; overflow-y: auto;
+            position: relative; /* 电脑端占位，推挤右侧 */
         }
         #side-menu.open { margin-left: 0; }
+
+        /* 新增：遮罩层基础样式（默认隐藏） */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 1002;
+        }
 
         .category-selector-container { padding: 15px 25px; border-bottom: 1px solid #f1f2f6; transition: border-color 0.3s; }
         .category-selector-container label { font-size: 14px; color: #636e72; font-weight: bold; display: block; margin-bottom: 8px; }
@@ -31,11 +43,77 @@
         
         #main-area { flex-grow: 1; display: flex; justify-content: center; align-items: center; position: relative; height: 100vh; overflow: hidden; transition: width 0.3s ease; }
 
-        #menu-btn { position: absolute; top: 20px; left: 25px; font-size: 30px; color: white; cursor: pointer; z-index: 100; text-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s; }
-        #menu-btn:hover { transform: scale(1.1); }
+        #menu-btn { 
+            position: absolute; 
+            top: 20px; 
+            left: 20px; 
+            font-size: 24px; 
+            color: white; 
+            cursor: pointer; 
+            z-index: 1001; /* 保证在主区域最上层 */
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+            transition: all 0.2s; 
+            background: rgba(255, 255, 255, 0.2);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            backdrop-filter: blur(5px);
+        }
+        #menu-btn:hover { 
+            transform: scale(1.1); 
+            background: rgba(255, 255, 255, 0.3);
+        }
 
-        .card-container { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); text-align: center; width: 350px; transition: all 0.3s ease; max-height: 85vh; display: flex; flex-direction: column; }
-        
+        /* 当侧边栏打开时，如果是白底，让汉堡按钮变紫 */
+        #side-menu.open ~ #main-area #menu-btn {
+            color: #6c5ce7; 
+            background: rgba(108, 92, 231, 0.1); /* 给一点淡紫色的半透明底座 */
+        }
+
+        /* 电脑端默认卡片样式 */
+        .card-container {
+            background: white; 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            text-align: center; 
+            width: 350px; 
+            transition: all 0.3s ease; 
+            max-height: 85vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* --- 手机端响应式布局核心 --- */
+        @media (max-width: 600px) {
+            #side-menu {
+                position: fixed; /* 手机端悬浮在上方，不推挤 */
+                width: 80%;      /* 占据 80% 屏幕 */
+                max-width: 300px;
+                margin-left: -100%; /* 默认藏在最左侧外 */
+            }
+            #side-menu.open {
+                margin-left: 0;
+            }
+            /* 手机端打开菜单时，显示遮罩层 */
+            #side-menu.open ~ #overlay {
+                display: block;
+            }
+            /* 手机端主区域强制满宽 */
+            #main-area {
+                width: 100% !important;
+                margin-left: 0 !important;
+            }
+            /* 手机端卡片微调，防拥挤 */
+            .card-container {
+                width: 85vw;
+                padding: 25px 20px;
+            }
+        }
+
         #welcome-screen h1 { color: #6c5ce7; font-size: 36px; margin-bottom: 10px; transition: color 0.3s; }
         #welcome-screen p { color: #636e72; font-size: 16px; margin-bottom: 30px; line-height: 1.6; }
         .highlight-text { color: #a29bfe; font-weight: bold; font-size: 18px; }
@@ -69,7 +147,7 @@
         #flashcard-screen { display: none; }
 
         /* =========================================
-           新增：夜间模式专属样式
+           夜间模式专属样式
            ========================================= */
         body.dark-mode {
             background: linear-gradient(135deg, #1e1e2f 0%, #252542 100%);
@@ -108,6 +186,11 @@
         body.dark-mode .list-meaning {
             color: #a4b0be;
         }
+        /* 夜间模式且侧边栏打开时，汉堡图标的颜色适应 */
+        body.dark-mode #side-menu.open ~ #main-area #menu-btn {
+            color: #f1f2f6;
+            background: rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -128,6 +211,8 @@
         <input type="file" id="import-file" style="display:none" onchange="importProgress(this)">
         <a href="#" onclick="resetCount()" style="color: #ff7675; margin-top: auto;">⚠️ 重置所有进度</a>
     </div>
+
+    <div id="overlay" onclick="toggleMenu()"></div>
 
     <div id="main-area">
         <div id="menu-btn" onclick="toggleMenu()">☰</div>
@@ -208,9 +293,6 @@
         document.getElementById('welcome-count').innerText = dailyCount;
         document.getElementById('count').innerText = dailyCount;
 
-        // =========================================
-        // 新增：夜间模式切换与初始化逻辑
-        // =========================================
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
@@ -218,14 +300,20 @@
         }
 
         function initDarkMode() {
-            if (localStorage.getItem('ielts_dark_mode') === 'true') {
-                document.body.classList.add('dark-mode');
-            }
-        }
-        // =========================================
+    const savedMode = localStorage.getItem('ielts_dark_mode');
+    
+    // 如果用户手动设过（true/false），就按手动来
+    if (savedMode !== null) {
+        if (savedMode === 'true') document.body.classList.add('dark-mode');
+    } 
+    // 如果用户没设过，就看系统是不是深色模式
+    else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark-mode');
+    }
+}
 
         function initCategories() {
-            initDarkMode(); // 页面加载时顺便初始化夜间模式
+            initDarkMode(); 
             
             const allWords = window.ieltsWords || [];
             const categories = [...new Set(allWords.map(w => w.category).filter(c => c))];
@@ -301,7 +389,7 @@
             let titleText = "";
 
             if (currentListMode === 'learned') {
-                targetWords = categoryWords.filter(w => wordData[w.word]); 
+                targetWords = categoryWords.filter(w => wordData[w.word]);
                 const dateFilter = document.getElementById('filter-date').value;
                 const levelFilter = document.getElementById('filter-level').value;
 
@@ -315,6 +403,11 @@
             } else {
                 targetWords = categoryWords.filter(w => !wordData[w.word]); 
                 titleText = `⏳ 未背诵 (${targetWords.length})`;
+                
+                if (targetWords.length > 100) {
+                    titleText += " (仅展示前100个)";
+                    targetWords = targetWords.slice(0, 100);
+                }
             }
 
             currentFilteredWords = targetWords;
@@ -425,7 +518,6 @@
 
             document.getElementById('meaning').innerText = "点击看释义"; 
             
-            // 修复：兼容夜间模式的默认文字颜色
             if(document.body.classList.contains('dark-mode')){
                 document.getElementById('meaning').style.color = "#636e72"; 
             } else {
@@ -457,45 +549,43 @@
             if(confirm("确定要彻底重置所有单词进度和计数吗？此操作不可逆！")) { localStorage.clear(); location.reload(); }
         }
 
-        // 【新增】：备份进度为 JSON 文件
-function backupProgress() {
-    const data = {
-        wordData: JSON.parse(localStorage.getItem('ielts_word_data') || '{}'),
-        dailyCount: localStorage.getItem('ielts_study_count') || '0'
-    };
-    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `雅思备份_${new Date().toLocaleDateString()}.json`;
-    link.click();
-}
-
-// 【新增】：从 JSON 文件恢复进度
-function importProgress(input) {
-    const file = input.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            if (data.wordData) {
-                if (confirm("导入将覆盖当前的背诵进度，确定吗？")) {
-                    localStorage.setItem('ielts_word_data', JSON.stringify(data.wordData));
-                    localStorage.setItem('ielts_study_count', data.dailyCount);
-                    alert("进度恢复成功！页面即将刷新。");
-                    location.reload();
-                }
-            } else {
-                alert("文件格式不正确！");
-            }
-        } catch (err) {
-            alert("读取失败，请确保文件是正确的备份格式。");
+        function backupProgress() {
+            const data = {
+                wordData: JSON.parse(localStorage.getItem('ielts_word_data') || '{}'),
+                dailyCount: localStorage.getItem('ielts_study_count') || '0'
+            };
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `雅思备份_${new Date().toLocaleDateString()}.json`;
+            link.click();
         }
-    };
-    reader.readAsText(file);
-}
+
+        function importProgress(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.wordData) {
+                        if (confirm("导入将覆盖当前的背诵进度，确定吗？")) {
+                            localStorage.setItem('ielts_word_data', JSON.stringify(data.wordData));
+                            localStorage.setItem('ielts_study_count', data.dailyCount);
+                            alert("进度恢复成功！页面即将刷新。");
+                            location.reload();
+                        }
+                    } else {
+                        alert("文件格式不正确！");
+                    }
+                } catch (err) {
+                    alert("读取失败，请确保文件是正确的备份格式。");
+                }
+            };
+            reader.readAsText(file);
+        }
     </script>
 </body>
 </html>

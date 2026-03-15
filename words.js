@@ -15404,9 +15404,9 @@ const ieltsWords = [
     {
         "word": "lodge",
         "category": "建筑场所",
-        "pos": "v.",
-        "phonetic": "/n.|租住/",
-        "meaning": "v. 小屋；度假屋\n\n例句：\nWhere we lodge is the problem",
+        "pos": "n. v.",
+        "phonetic": "",
+        "meaning": "n.\n 租住\n v. \n小屋；度假屋\n\n例句：\nWhere we lodge is the problem",
         "example": ""
     },
     {
