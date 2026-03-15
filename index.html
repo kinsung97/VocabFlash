@@ -565,29 +565,33 @@
                 return;
             }
 
-            let csvContent = "\uFEFF"; 
-            csvContent += "分类,单词,词性,音标,释义,例句,熟练度,最近打卡日期,下次复习日期\n";
+            // 使用分号分隔符，Excel 默认会正确识别并启用筛选
+            let csvContent = "\uFEFF";
+            // 表头使用更清晰的列名
+            csvContent += "分类;单词;词性;音标;释义;例句;熟练度;最近打卡日期;下次复习日期\n";
 
             currentFilteredWords.forEach(w => {
                 const record = wordData[w.word] || {};
                 const levelText = record.level ? levelStyleMap[record.level].text : "无记录";
-                
+
                 const lastDate = record.lastReviewed ? new Date(record.lastReviewed).toLocaleDateString() : "无记录";
                 const nextDate = record.nextReview ? new Date(record.nextReview).toLocaleDateString() : "无记录";
-                
+
+                // 使用分号作为分隔符，避免与内容中的逗号冲突
                 const safeCategory = w.category ? `"${w.category.replace(/"/g, '""')}"` : '""';
                 const safeMeaning = w.meaning ? `"${w.meaning.replace(/"/g, '""')}"` : '""';
                 const safeExample = w.example ? `"${w.example.replace(/"/g, '""')}"` : '""';
                 const safePos = w.pos ? `"${w.pos}"` : '""';
 
-                csvContent += `${safeCategory},${w.word},${safePos},${w.phonetic || ''},${safeMeaning},${safeExample},${levelText},${lastDate},${nextDate}\n`;
+                csvContent += `${safeCategory};${w.word};${safePos};${w.phonetic || ''};${safeMeaning};${safeExample};${levelText};${lastDate};${nextDate}\n`;
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            // 使用 .xls 扩展名让 Excel 直接打开，并添加 BOM 确保中文不乱码
+            const blob = new Blob([csvContent], { type: 'application/vnd.ms-excel;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `雅思背诵记录_${new Date().toLocaleDateString()}.csv`);
+            link.setAttribute("download", `雅思背诵记录_${new Date().toLocaleDateString()}.xls`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
