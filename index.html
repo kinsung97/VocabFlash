@@ -272,6 +272,7 @@
             </select>
         </div>
         <a href="#" onclick="toggleDarkMode()">🌙 / ☀️ 夜间模式</a>
+        <a href="#" onclick="toggleAutoSpeak()">🔊 自动发音: <span id="auto-speak-status">开</span></a>
         <a href="#" onclick="backupProgress()">📥 备份进度 (导出 JSON)</a>
         <a href="#" onclick="document.getElementById('import-file').click()">📤 恢复进度 (导入 JSON)</a>
         <input type="file" id="import-file" style="display:none" onchange="importProgress(this)">
@@ -420,6 +421,23 @@
             localStorage.setItem('ielts_theme', theme);
         }
 
+        // 自动发音设置
+        let autoSpeakEnabled = localStorage.getItem('ielts_auto_speak') !== 'false'; // 默认开启
+
+        function toggleAutoSpeak() {
+            autoSpeakEnabled = !autoSpeakEnabled;
+            localStorage.setItem('ielts_auto_speak', autoSpeakEnabled);
+            document.getElementById('auto-speak-status').innerText = autoSpeakEnabled ? '开' : '关';
+        }
+
+        function initAutoSpeak() {
+            const saved = localStorage.getItem('ielts_auto_speak');
+            if (saved !== null) {
+                autoSpeakEnabled = saved === 'true';
+            }
+            document.getElementById('auto-speak-status').innerText = autoSpeakEnabled ? '开' : '关';
+        }
+
         function initTheme() {
             const savedTheme = localStorage.getItem('ielts_theme') || 'purple';
             document.getElementById('theme-select').value = savedTheme;
@@ -430,7 +448,8 @@
 
         function initCategories() {
             initDarkMode();
-            initTheme(); 
+            initTheme();
+            initAutoSpeak(); 
             
             const allWords = window.ieltsWords || [];
             const categories = [...new Set(allWords.map(w => w.category).filter(c => c))];
@@ -721,7 +740,7 @@
             
             document.getElementById('start-btn').style.display = 'none'; document.getElementById('controls').style.display = 'grid';
 
-            speakCurrentWord();
+            if (autoSpeakEnabled) speakCurrentWord();
             document.getElementById('meaning').onclick = function() {
                 this.innerText = currentWord.meaning + (currentWord.example ? "\n\n" + currentWord.example : ""); 
                 if(document.body.classList.contains('dark-mode')){
