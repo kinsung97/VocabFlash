@@ -278,6 +278,17 @@
         body.dark-mode .progress-title { color: #f1f2f6; border-bottom-color: #3f3f4e !important; }
         body.dark-mode .progress-stats { color: #a4b0be; }
         body.dark-mode .progress-bar-bg { background: #3f3f4e; }
+
+        /* 欢迎页提示框夜间模式适配 */
+        body.dark-mode #welcome-screen div[style*="background: rgba(0,0,0,0.03)"] { 
+            background: #2c2c2e !important; 
+            border-color: rgba(255,255,255,0.05) !important; 
+            color: #a4b0be !important; 
+        }
+        body.dark-mode #welcome-screen code { 
+            background: #3f3f4e; padding: 2px 4px; border-radius: 4px; 
+        }
+
     </style>
 </head>
 <body>
@@ -302,7 +313,7 @@
             <div class="tab-icon">📖</div><span>背诵</span>
         </div>
         <div class="tab-item" onclick="showList('learned')">
-            <div class="tab-icon">📚</div><span>词库</span>
+            <div class="tab-icon">📚</div><span>资料库</span>
         </div>
         <div class="tab-item" onclick="showStatus()">
             <div class="tab-icon">📈</div><span>进度</span>
@@ -317,8 +328,30 @@
         <div id="menu-btn" onclick="toggleMenu()">☰</div>
 
         <div id="welcome-screen" class="card-container">
-            <h1>雅思闪卡🚀</h1>
-            <p>今日已学习的单词：<br><span class="highlight-text"><span id="welcome-count">0</span> 个</span></p>
+            <h1 style="margin-bottom: 5px;">雅思闪卡🚀</h1>
+            <p style="margin-bottom: 20px;">今日已学习的单词：<span class="highlight-text" style="font-size: 22px;"><span id="welcome-count">0</span> 个</span></p>
+            
+            <div style="text-align: left; background: rgba(0,0,0,0.03); padding: 18px; border-radius: 16px; margin-bottom: 25px; font-size: 13px; color: #636e72; line-height: 1.6; border: 1px solid rgba(0,0,0,0.03);">
+                <div style="font-weight: bold; color: var(--primary-color); margin-bottom: 10px; font-size: 15px; display: flex; align-items: center; gap: 5px;">
+                    💡 使用指南
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <b>⚙️ 核心功能：</b>切换词库、夜间模式、修改主题色等，请前往底部的 <b>“设置”</b> 面板。
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <b>💾 数据安全：</b>您的背诵进度完全<b>存储在当前浏览器缓存中</b>。为防数据丢失，请定期在设置中点击 <b>“导出备份”</b>。
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <b>⌨️ 快捷键：</b>电脑端支持全键盘操作。<code>Space</code> 翻看释义，<code>1到4</code> 选择熟悉度，<code>S</code> 键发音，<code>F</code> 键收藏。
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <b>📱 列表筛选：</b>手机端点击下方 <b>“资料库”</b> 图标后，可通过顶部的下拉菜单自由切换查看 <b>“已背、未背、收藏”</b> 单词列表。
+                </div>
+                <div style="margin-bottom: 8px;">
+                    <b>📊 表格导出：</b>在“已背”或“收藏”列表中，点击底部的 <b>“导出 Excel”</b>，可将单词数据（含分类、熟练度、日期）导出为 CSV 表格进行复习。
+                </div>
+            </div>
+
             <button onclick="enterApp()">开始今天的挑战</button>
         </div>
 
@@ -348,6 +381,11 @@
             <h2 id="list-title">单词列表</h2>
             
             <div id="list-filters">
+                <select id="list-mode-select" class="filter-select" onchange="changeListMode()" style="font-weight: bold; color: var(--primary-color);">
+                    <option value="learned">✅ 已背单词</option>
+                    <option value="unlearned">📝 未背单词</option>
+                    <option value="favorite">⭐ 收藏单词</option>
+                </select>
                 <select id="filter-date" class="filter-select" onchange="applyFilters()">
                     <option value="all">📅 全部时间</option>
                     <option value="today">今天</option>
@@ -626,8 +664,19 @@
             return !!(record && record.level && record.lastReviewed && record.nextReview);
         }
 
+// 【新增】：处理列表模式的切换
+        function changeListMode() {
+            const mode = document.getElementById('list-mode-select').value;
+            showList(mode);
+        }
+
         function showList(type) {
             currentListMode = type;
+            
+            // 同步下拉框的显示状态
+            const modeSelect = document.getElementById('list-mode-select');
+            if (modeSelect) modeSelect.value = type;
+
             const listFilters = document.getElementById('list-filters');
             const dateFilter = document.getElementById('filter-date');
             const levelFilter = document.getElementById('filter-level');
@@ -635,14 +684,18 @@
 
             dateFilter.value = 'all'; levelFilter.value = 'all'; categoryFilter.value = 'all';
 
+            // 统一显示整个筛选栏
+            listFilters.style.display = 'flex'; 
+
             if (type === 'learned') {
-                listFilters.style.display = 'flex'; dateFilter.style.display = ''; levelFilter.style.display = ''; categoryFilter.style.display = '';
+                dateFilter.style.display = ''; levelFilter.style.display = ''; categoryFilter.style.display = '';
                 document.getElementById('export-btn').style.display = 'block';
             } else if (type === 'favorite') {
-                listFilters.style.display = 'flex'; dateFilter.style.display = 'none'; levelFilter.style.display = 'none'; categoryFilter.style.display = '';
+                dateFilter.style.display = 'none'; levelFilter.style.display = 'none'; categoryFilter.style.display = '';
                 document.getElementById('export-btn').style.display = 'block';
             } else {
-                listFilters.style.display = 'none'; dateFilter.style.display = ''; levelFilter.style.display = ''; categoryFilter.style.display = 'none';
+                // 未背单词模式：隐藏日期和熟练度，保留分类筛选
+                dateFilter.style.display = 'none'; levelFilter.style.display = 'none'; categoryFilter.style.display = '';
                 document.getElementById('export-btn').style.display = 'none';
             }
 
@@ -652,7 +705,6 @@
 
         function applyFilters() {
             const allWords = window.ieltsWords || [];
-            const categoryWords = currentCategory === 'all' ? allWords : allWords.filter(w => w.category === currentCategory);
             const listCategoryFilter = document.getElementById('filter-category').value;
             let targetWords = []; let titleText = "";
 
@@ -674,7 +726,9 @@
                 if (listCategoryFilter !== 'all') targetWords = targetWords.filter(w => (w.category || '未分类') === listCategoryFilter);
                 titleText = `⭐ 收藏单词 (${targetWords.length})`;
             } else {
-                targetWords = categoryWords.filter(w => !isLearnedRecord(wordData[w.word]));
+                // 未背单词逻辑：先找出所有没背过的词，再根据分类下拉框过滤
+                targetWords = allWords.filter(w => !isLearnedRecord(wordData[w.word]));
+                if (listCategoryFilter !== 'all') targetWords = targetWords.filter(w => (w.category || '未分类') === listCategoryFilter);
                 titleText = `📝 未背诵(${targetWords.length})`;
 
                 if (targetWords.length > 100) {
