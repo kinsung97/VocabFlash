@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -80,7 +80,7 @@
 
         .category-selector-container { padding: 15px 25px; border-bottom: 1px solid #f1f2f6; transition: border-color 0.3s; }
         .category-selector-container label { font-size: 14px; color: #636e72; font-weight: bold; display: block; margin-bottom: 8px; }
-        #category-select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; color: #2d3436; font-size: 14px; outline: none; transition: all 0.3s; }
+        #category-select, #theme-select { width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; color: #2d3436; font-size: 14px; outline: none; transition: all 0.3s; }
 
         #side-menu a { padding: 18px 25px; text-decoration: none; color: #2d3436; font-size: 16px; font-weight: bold; border-bottom: 1px solid #f1f2f6; transition: 0.2s; }
         #side-menu a:hover { background: #f8f9fa; color: var(--primary-color); padding-left: 30px; }
@@ -111,7 +111,7 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* 当侧边栏打开时，如果是白底，让汉堡按钮变紫 */
+        /* 当侧边栏打开时，如果是白底，让汉堡按钮变色 */
         #side-menu.open ~ #main-area #menu-btn {
             color: var(--primary-color); 
             background: rgba(108, 92, 231, 0.1); /* 给一点淡紫色的半透明底座 */
@@ -137,7 +137,7 @@
                 position: fixed; /* 手机端悬浮在上方，不推挤 */
                 width: 80%;      /* 占据 80% 屏幕 */
                 max-width: 300px;
-                margin-left: -100%; /* 默认藏在最左侧外 */
+                margin-left: -100%; /* 默认藏在最左侧边 */
             }
             #side-menu.open {
                 margin-left: 0;
@@ -181,9 +181,14 @@
         .filter-select { padding: 6px; border-radius: 6px; border: 1px solid #dfe6e9; color: #636e72; font-size: 13px; outline: none; background: #f8f9fa; cursor: pointer; transition: all 0.3s;}
 
         #list-content-wrapper { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; padding-right: 5px;}
+        #status-screen { display: none; padding: 30px 20px; width: 90%; max-width: 450px; text-align: left; overflow: hidden; }
+        #status-content-wrapper { overflow-y: auto; flex-grow: 1; margin-bottom: 15px; padding-right: 5px; }
         .list-item { border-bottom: 1px solid #f1f2f6; padding: 12px 0; transition: border-color 0.3s; }
+        .list-category-tag { display: inline-block; margin-bottom: 6px; padding: 2px 8px; font-size: 11px; border-radius: 999px; color: white; border: none; background: linear-gradient(90deg, var(--primary-color), var(--primary-light)); }
         .list-word { font-weight: bold; color: #2d3436; font-size: 18px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; transition: color 0.3s;}
         .list-meaning { color: #636e72; font-size: 14px; margin-top: 5px; transition: color 0.3s;}
+        .list-favorite-toggle { margin-left: auto; border: none; background: none; color: #fdcb6e; font-size: 20px; cursor: pointer; padding: 2px 4px; line-height: 1; width: auto; box-shadow: none; }
+        #favorite-btn { color: var(--primary-color); text-shadow: none; }
         
         button { background: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: transform 0.2s; width: 100%; flex-shrink: 0; }
         button:active { transform: scale(0.95); }
@@ -222,6 +227,7 @@
             border-bottom-color: #3f3f4e;
         }
         body.dark-mode #category-select,
+        body.dark-mode #theme-select,
         body.dark-mode .filter-select {
             background: #3f3f4e;
             color: #f1f2f6;
@@ -229,6 +235,15 @@
         }
         body.dark-mode .list-meaning {
             color: #a4b0be;
+        }
+        body.dark-mode .list-category-tag {
+            color: white;
+            border: none;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        }
+        body.dark-mode .list-favorite-toggle,
+        body.dark-mode #favorite-btn {
+            color: #ffeaa7;
         }
         /* 夜间模式且侧边栏打开时，汉堡图标的颜色适应 */
         body.dark-mode #side-menu.open ~ #main-area #menu-btn {
@@ -253,14 +268,15 @@
 
     <div id="side-menu">
         <div class="category-selector-container">
-            <label>📚 选择当前词库：</label>
+            <label>📚 选择当前词库</label>
             <select id="category-select" onchange="changeCategory()">
                 <option value="all">全库混背 (All)</option>
             </select>
         </div>
         <a href="#" onclick="switchView('flashcard-screen')">📖 开始背诵</a>
         <a href="#" onclick="showList('learned')">✅ 已背诵单词</a>
-        <a href="#" onclick="showList('unlearned')">⏳ 未背诵单词</a>
+        <a href="#" onclick="showList('unlearned')">📝 未背诵单词</a>
+        <a href="#" onclick="showList('favorite')">⭐ 收藏单词</a>
         <a href="#" onclick="showStatus()">📈 学习进度</a>
         <div class="category-selector-container" style="margin-top: 10px;">
             <label>🎨 主题色：</label>
@@ -285,15 +301,18 @@
         <div id="menu-btn" onclick="toggleMenu()">☰</div>
 
         <div id="welcome-screen" class="card-container">
-            <h1>雅思闪卡 🚀</h1>
+            <h1>雅思闪卡🚀</h1>
             <p>今日已斩获单词：<br><span class="highlight-text"><span id="welcome-count">0</span> 个</span></p>
             <button onclick="enterApp()">开始今天的挑战</button>
         </div>
 
         <div id="flashcard-screen" class="card-container">
-            <div id="current-category-badge">当前：全库混背</div>
-            <div id="stats">今日：<span id="count">0</span> | 本库待复习：<span id="review-count">0</span></div>
-            <h1 id="word">Ready?</h1>
+            <div id="current-category-badge">当前：全库混合</div>
+            <div id="stats">今日已学 <span id="count">0</span> | 本库待复习：<span id="review-count">0</span></div>
+            <div style="position: relative;">
+                <h1 id="word">Ready?</h1>
+                <button id="favorite-btn" onclick="toggleFavorite()" style="position: absolute; right: -10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 24px; cursor: pointer; padding: 5px; width: auto; box-shadow: none;">☆</button>
+            </div>
             <div id="phonetic-container">
                 <span id="phonetic"></span>
                 <div id="pos-container" style="display: flex; gap: 5px;"></div>
@@ -304,7 +323,7 @@
                 <button onclick="handleRate(1)" style="background: #ff7675; font-size: 14px;">生疏 (1d)</button>
                 <button onclick="handleRate(2)" style="background: #fdcb6e; font-size: 14px;">模糊 (2d)</button>
                 <button onclick="handleRate(3)" style="background: #55efc4; font-size: 14px;">熟悉 (4d)</button>
-                <button onclick="handleRate(5)" style="background: #00cec9; font-size: 14px;">简单 (7d)</button>
+                <button onclick="handleRate(5)" style="background: #00cec9; font-size: 14px;">简单(7d)</button>
             </div>
             <button id="start-btn" onclick="nextWord()" style="display: none;">下一个</button>
         </div>
@@ -324,7 +343,10 @@
                     <option value="1">生疏 (1d)</option>
                     <option value="2">模糊 (2d)</option>
                     <option value="3">熟悉 (4d)</option>
-                    <option value="5">简单 (7d)</option>
+                    <option value="5">简单(7d)</option>
+                </select>
+                <select id="filter-category" class="filter-select" onchange="applyFilters()" style="display:none;">
+                    <option value="all">📁 全部分类</option>
                 </select>
             </div>
 
@@ -338,26 +360,28 @@
             </div>
         </div>
 
-        <!-- 进度面板 -->
-        <div id="status-screen" class="card-container" style="display: none; padding: 30px 20px; width: 90%; max-width: 450px; text-align: left; overflow-y: auto;">
+        
+        <div id="status-screen" class="card-container">
             <h2 id="status-title" style="color: var(--primary-color); text-align: center; margin-top: 0; margin-bottom: 25px;">📊 学习进度</h2>
 
-            <div style="margin-bottom: 30px;">
-                <h3 class="progress-title">🏆 总进度</h3>
-                <div class="progress-stats">
-                    <span id="overall-progress-text">0 / 0</span>
-                    <span id="overall-progress-percent">0%</span>
+            <div id="status-content-wrapper">
+                <div style="margin-bottom: 30px;">
+                    <h3 class="progress-title">🏆 总进度</h3>
+                    <div class="progress-stats">
+                        <span id="overall-progress-text">0 / 0</span>
+                        <span id="overall-progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="overall-progress-fill" class="progress-bar-fill" style="background: linear-gradient(90deg, var(--primary-color), var(--primary-light));"></div>
+                    </div>
                 </div>
-                <div class="progress-bar-bg">
-                    <div id="overall-progress-fill" class="progress-bar-fill" style="background: linear-gradient(90deg, var(--primary-color), var(--primary-light));"></div>
+
+                <h3 class="progress-title" style="border-bottom: 1px solid #f1f2f6; padding-bottom: 10px; margin-bottom: 15px;">📁 分类进度</h3>
+                <div id="category-progress-container" style="display: flex; flex-direction: column; gap: 15px;">
                 </div>
             </div>
 
-            <h3 class="progress-title" style="border-bottom: 1px solid #f1f2f6; padding-bottom: 10px; margin-bottom: 15px;">📁 分类进度</h3>
-            <div id="category-progress-container" style="display: flex; flex-direction: column; gap: 15px;">
-            </div>
-
-            <button onclick="switchView('flashcard-screen')" style="margin-top: 25px;">返回背诵</button>
+             <button onclick="switchView('flashcard-screen')" style="margin-top: 10px;">返回背诵</button>
         </div>
     </div>
 
@@ -405,7 +429,7 @@
         function initDarkMode() {
             const savedMode = localStorage.getItem('ielts_dark_mode');
 
-            // 如果用户手动设过（true/false），就按手动来
+            // 如果用户手动设过（true/false），就按手动设置
             if (savedMode !== null) {
                 if (savedMode === 'true') document.body.classList.add('dark-mode');
             }
@@ -452,11 +476,20 @@
             initAutoSpeak(); 
             
             const allWords = window.ieltsWords || [];
-            const categories = [...new Set(allWords.map(w => w.category).filter(c => c))];
+            const categories = [...new Set(allWords.map(w => w.category || '未分类'))].sort();
             const select = document.getElementById('category-select');
+            const listCategorySelect = document.getElementById('filter-category');
+
             categories.forEach(cat => {
                 const option = document.createElement('option');
-                option.value = cat; option.innerText = cat; select.appendChild(option);
+                option.value = cat;
+                option.innerText = cat;
+                select.appendChild(option);
+
+                const listOption = document.createElement('option');
+                listOption.value = cat;
+                listOption.innerText = cat;
+                listCategorySelect.appendChild(listOption);
             });
             select.value = currentCategory;
             updateCategoryBadge();
@@ -503,18 +536,43 @@
             const d = new Date(timestamp); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
             return d.getDate() === yesterday.getDate() && d.getMonth() === yesterday.getMonth() && d.getFullYear() === yesterday.getFullYear();
         }
+        function getDateKey(timestamp) {
+            if (!timestamp) return null;
+            const d = new Date(timestamp);
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+        }
 
         function showList(type) {
             currentListMode = type;
-            if (type === 'unlearned') {
-                document.getElementById('list-filters').style.display = 'none';
-                document.getElementById('export-btn').style.display = 'none';
+            const listFilters = document.getElementById('list-filters');
+            const dateFilter = document.getElementById('filter-date');
+            const levelFilter = document.getElementById('filter-level');
+            const categoryFilter = document.getElementById('filter-category');
+
+            dateFilter.value = 'all';
+            levelFilter.value = 'all';
+            categoryFilter.value = 'all';
+
+            if (type === 'learned') {
+                listFilters.style.display = 'flex';
+                dateFilter.style.display = '';
+                levelFilter.style.display = '';
+                categoryFilter.style.display = 'none';
+                document.getElementById('export-btn').style.display = 'block';
+            } else if (type === 'favorite') {
+                listFilters.style.display = 'flex';
+                dateFilter.style.display = 'none';
+                levelFilter.style.display = 'none';
+                categoryFilter.style.display = '';
+                document.getElementById('export-btn').style.display = 'block';
             } else {
-                document.getElementById('list-filters').style.display = 'flex';
-                document.getElementById('filter-date').value = 'all';
-                document.getElementById('filter-level').value = 'all';
-                document.getElementById('export-btn').style.display = 'block'; 
+                listFilters.style.display = 'none';
+                dateFilter.style.display = '';
+                levelFilter.style.display = '';
+                categoryFilter.style.display = 'none';
+                document.getElementById('export-btn').style.display = 'none';
             }
+
             applyFilters();
             switchView('list-screen');
         }
@@ -536,11 +594,18 @@
 
                 if (levelFilter !== 'all') targetWords = targetWords.filter(w => wordData[w.word].level == levelFilter);
 
-                titleText = `✅ 已背诵 (${targetWords.length})`;
+                titleText = `✅ 已背诵(${targetWords.length})`;
+            } else if (currentListMode === 'favorite') {
+                targetWords = allWords.filter(w => wordData[w.word] && wordData[w.word].isFavorite);
+                const categoryFilter = document.getElementById('filter-category').value;
+                if (categoryFilter !== 'all') {
+                    targetWords = targetWords.filter(w => (w.category || '未分类') === categoryFilter);
+                }
+                titleText = `⭐ 收藏单词 (${targetWords.length})`;
             } else {
-                targetWords = categoryWords.filter(w => !wordData[w.word]); 
-                titleText = `⏳ 未背诵 (${targetWords.length})`;
-                
+                targetWords = categoryWords.filter(w => !wordData[w.word]);
+                titleText = `📝 未背诵(${targetWords.length})`;
+
                 if (targetWords.length > 100) {
                     titleText += " (仅展示前100个)";
                     targetWords = targetWords.slice(0, 100);
@@ -590,7 +655,7 @@
                         <span>${stats.learned} / ${stats.total} (${percent}%)</span>
                     </div>
                     <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: 0%; background: linear-gradient(90deg, #00b894, #55efc4);"></div>
+                        <div class="progress-bar-fill" style="width: 0%; background: linear-gradient(90deg, var(--primary-color), var(--primary-light));"></div>
                     </div>
                 </div>`;
             });
@@ -617,6 +682,8 @@
             if (wordsArray.length === 0) { content.innerHTML = '<p style="text-align:center; color:#ccc; margin-top:30px;">没有找到符合条件的单词~</p>'; return; }
 
             wordsArray.forEach(w => {
+                const shouldShowCategory = currentListMode === 'favorite';
+                const categoryTagHTML = shouldShowCategory ? `<div class="list-category-tag">📁 ${w.category || '未分类'}</div>` : '';
                 let posBadgesHTML = '';
                 if (w.pos) {
                     const posArray = w.pos.split(/[\/\s]+/).filter(p => p.trim() !== '');
@@ -630,9 +697,13 @@
                         memoryBadgeHTML = `<span onclick="changeWordLevel('${w.word}', event)" style="border: 1px solid ${styleInfo.color}; color: ${styleInfo.color}; padding: 1px 5px; border-radius: 4px; font-size: 10px; margin-left: auto; cursor: pointer; user-select: none;" title="点击修改熟练度">${styleInfo.text}</span>`;
                     }
                 }
+                const favoriteToggleHTML = currentListMode === 'favorite'
+                    ? `<button class="list-favorite-toggle" onclick="toggleFavoriteByWord('${w.word}', event)" title="取消收藏">★</button>`
+                    : '';
                 content.innerHTML += `
                     <div class="list-item">
-                        <div class="list-word"><span>${w.word}</span><div style="display:flex; gap:2px; flex-wrap:wrap;">${posBadgesHTML}</div><span style="font-size:13px; color:var(--primary-light); font-weight:normal; margin-left: 4px;">${w.phonetic || ''}</span>${memoryBadgeHTML}</div>
+                        ${categoryTagHTML}
+                        <div class="list-word"><span>${w.word}</span><div style="display:flex; gap:2px; flex-wrap:wrap;">${posBadgesHTML}</div><span style="font-size:13px; color:var(--primary-light); font-weight:normal; margin-left: 4px;">${w.phonetic || ''}</span>${memoryBadgeHTML}${favoriteToggleHTML}</div>
                         <div class="list-meaning">${w.meaning}</div>
                     </div>`;
             });
@@ -666,7 +737,8 @@
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            link.setAttribute("download", `雅思背诵记录_${new Date().toLocaleDateString()}.csv`);
+            const exportPrefix = currentListMode === 'favorite' ? '雅思收藏单词' : '雅思背诵记录';
+            link.setAttribute("download", `${exportPrefix}_${new Date().toLocaleDateString()}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
@@ -737,6 +809,42 @@
             applyFilters();
         }
 
+        // 收藏功能
+        function toggleFavorite() {
+            if (!currentWord || !currentWord.word) return;
+
+            const record = wordData[currentWord.word] || {};
+            const isFavorite = !record.isFavorite;
+
+            wordData[currentWord.word] = {
+                ...record,
+                isFavorite: isFavorite
+            };
+            localStorage.setItem('ielts_word_data', JSON.stringify(wordData));
+            updateFavoriteButton();
+        }
+
+        function toggleFavoriteByWord(word, event) {
+            if (event) event.stopPropagation();
+            const record = wordData[word] || {};
+            wordData[word] = {
+                ...record,
+                isFavorite: !record.isFavorite
+            };
+            localStorage.setItem('ielts_word_data', JSON.stringify(wordData));
+            applyFilters();
+        }
+
+        function updateFavoriteButton() {
+            const btn = document.getElementById('favorite-btn');
+            if (!btn || !currentWord) return;
+
+            const record = wordData[currentWord.word];
+            const isFavorite = record && record.isFavorite;
+            btn.innerText = isFavorite ? '★' : '☆';
+            btn.title = isFavorite ? '取消收藏' : '收藏单词';
+        }
+
         function speakCurrentWord() {
             if (currentWord && currentWord.word) {
                 if ('speechSynthesis' in window) {
@@ -750,16 +858,18 @@
 
         function nextWord() {
             const now = Date.now();
+            const todayKey = getDateKey(now);
             const allWords = window.ieltsWords || [];
             let categoryWords = currentCategory === 'all' ? allWords : allWords.filter(w => w.category === currentCategory);
 
-            // 分离到期单词：优先复习生疏(1天)的词
+            // 分离到期单词：优先复习生疏1天的词
             let level1Words = []; // 生疏 - 最优先
             let otherDueWords = []; // 其他到期单词
 
             categoryWords.forEach(w => {
                 const record = wordData[w.word];
-                if (!record || record.nextReview <= now) {
+                const isDue = !record || !record.nextReview || getDateKey(record.nextReview) <= todayKey;
+                if (isDue) {
                     if (record && record.level === 1) {
                         level1Words.push(w); // 生疏的词优先
                     } else {
@@ -776,7 +886,7 @@
             if (dueWords.length === 0) {
                 document.getElementById('word').innerText = "All Done!"; document.getElementById('phonetic').innerText = "";
                 document.getElementById('pos-container').innerHTML = '';
-                document.getElementById('meaning').innerText = `本分类下今日任务已完成 🎉\n可以切换其他词库继续！`;
+                document.getElementById('meaning').innerText = `本分类下今日任务已完成🎉\n可以切换其他词库继续！`;
                 document.getElementById('controls').style.display = 'none'; return;
             }
 
@@ -804,6 +914,9 @@
             
             document.getElementById('start-btn').style.display = 'none'; document.getElementById('controls').style.display = 'grid';
 
+            // 更新收藏按钮状态
+            updateFavoriteButton();
+
             if (autoSpeakEnabled) speakCurrentWord();
             document.getElementById('meaning').onclick = function() {
                 this.innerText = currentWord.meaning + (currentWord.example ? "\n\n" + currentWord.example : ""); 
@@ -816,7 +929,7 @@
         }
 
         function handleRate(days) {
-            // 计算下次复习时间：设置为几天后凌晨5点（而不是精确的24小时后）
+            // 计算下次复习时间：设置为几天后凌晨0点（而不是精确的24小时后）
             const now = new Date();
             const nextReview = new Date(now.getFullYear(), now.getMonth(), now.getDate() + days, 5, 0, 0).getTime();
             wordData[currentWord.word] = { nextReview: nextReview, level: days, lastReviewed: Date.now() };
