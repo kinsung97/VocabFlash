@@ -3036,9 +3036,9 @@ const ieltsWords = [
     {
         "word": "amphibian",
         "category": "动物保护",
-        "pos": "n.",
-        "phonetic": "/adj.|两栖动物/",
-        "meaning": "n. 两栖的\n\n例句：\nNobody knows why amphibians are disappearing. Dolphins are dying and coral is turning white",
+        "pos": "n. adj.",
+        "phonetic": "",
+        "meaning": "n.\n两栖动物\nadj.\n两栖的\n\n例句：\nNobody knows why amphibians are disappearing. Dolphins are dying and coral is turning white",
         "example": ""
     },
     {
