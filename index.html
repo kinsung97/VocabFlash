@@ -11,6 +11,7 @@
             --primary-color: #6c5ce7;
             --primary-light: #a29bfe;
             --primary-dark: #5b4cdb;
+            --primary-glow: rgba(108, 92, 231, 0.4);
             --gradient-start: #667eea;
             --gradient-end: #764ba2;
         }
@@ -20,8 +21,9 @@
             --primary-color: #3498db;
             --primary-light: #74b9ff;
             --primary-dark: #2980b9;
-            --gradient-start: #3498db;
-            --gradient-end: #2980b9;
+            --primary-glow: rgba(52, 152, 219, 0.4);
+            --gradient-start: #74b9ff;
+            --gradient-end: #0984e3;
         }
 
         /* 主题色：薄荷绿 */
@@ -29,8 +31,9 @@
             --primary-color: #00b894;
             --primary-light: #55efc4;
             --primary-dark: #00a085;
-            --gradient-start: #00b894;
-            --gradient-end: #00a085;
+            --primary-glow: rgba(0, 184, 148, 0.4);
+            --gradient-start: #55efc4;
+            --gradient-end: #00b894;
         }
 
         /* 主题色：活力橙 */
@@ -38,8 +41,20 @@
             --primary-color: #e67e22;
             --primary-light: #fab1a0;
             --primary-dark: #d35400;
-            --gradient-start: #e67e22;
-            --gradient-end: #d35400;
+            --primary-glow: rgba(230, 126, 34, 0.4);
+            --gradient-start: #fc917a;
+            --gradient-end: #e67e22;
+        }
+
+        
+        /* 主题色：落霞 */
+        body.theme-sunset {
+            --primary-color: #FA7C5E;
+            --primary-light: #FFB199;
+            --primary-dark: #E66A4D;
+            --primary-glow: rgba(250, 124, 94, 0.4);
+            --gradient-start: #FFB199;
+            --gradient-end: #FA7C5E;
         }
 
         /* --- 基础样式 --- */
@@ -207,7 +222,7 @@
         .list-favorite-toggle { margin-left: auto; border: none; background: none; color: #fdcb6e; font-size: 20px; cursor: pointer; padding: 2px 4px; line-height: 1; width: auto; box-shadow: none; }
         #favorite-btn { color: var(--primary-color); text-shadow: none; }
         
-        button { background: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: transform 0.2s; width: 100%; flex-shrink: 0; }
+        button { background: var(--primary-color); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px var(--primary-glow); transition: transform 0.2s; width: 100%; flex-shrink: 0; }
         button:active { transform: scale(0.95); }
         #controls { display: none; grid-template-columns: 1fr 1fr; gap: 10px; }
         #flashcard-screen { display: none; }
@@ -216,7 +231,7 @@
            夜间模式专属样式
            ========================================= */
         body.dark-mode {
-            background: linear-gradient(135deg, #1e1e2f 0%, #252542 100%);
+            background: linear-gradient(135deg, #121212 0%, #2a2a2a 100%);
         }
         body.dark-mode #side-menu,
         body.dark-mode .card-container {
@@ -307,6 +322,7 @@
                 <option value="blue">🔵 天空蓝</option>
                 <option value="green">🟢 薄荷绿</option>
                 <option value="orange">🟠 活力橙</option>
+                <option value="sunset">🟧 落霞</option>
             </select>
         </div>
         <a href="#" onclick="toggleDarkMode()">🌙 / ☀️ 夜间模式</a>
@@ -324,7 +340,7 @@
 
         <div id="welcome-screen" class="card-container">
             <h1>雅思闪卡🚀</h1>
-            <p>今日已斩获单词：<br><span class="highlight-text"><span id="welcome-count">0</span> 个</span></p>
+            <p>今日已学习的单词：<br><span class="highlight-text"><span id="welcome-count">0</span> 个</span></p>
             <button onclick="enterApp()">开始今天的挑战</button>
         </div>
 
@@ -460,7 +476,7 @@
         // 主题色切换
         function changeTheme() {
             const theme = document.getElementById('theme-select').value;
-            document.body.classList.remove('theme-blue', 'theme-green', 'theme-orange');
+            document.body.classList.remove('theme-blue', 'theme-green', 'theme-orange', 'theme-sunset');
             if (theme !== 'purple') {
                 document.body.classList.add(`theme-${theme}`);
             }
