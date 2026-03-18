@@ -400,7 +400,7 @@
             overflow-y: visible;
             box-sizing: border-box;
             padding-top: calc(95px + var(--safe-area-inset-top));
-            padding-bottom: var(--safe-area-inset-bottom); /* 补上底部安全区距离 */
+            padding-bottom: var(--safe-area-inset-bottom); /* 桌面端恢复原来的设置 */
         }
 
         /* 高级毛玻璃卡片 */
@@ -419,7 +419,7 @@
             text-align: center; 
             width: 380px; 
             transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
-            max-height: calc(100vh - var(--safe-area-inset-top) - var(--safe-area-inset-bottom) - 120px); 
+            min-height: 400px; 
             display: flex; 
             flex-direction: column; 
         }
@@ -469,6 +469,7 @@
                 padding: 10px 16px;
                 border-radius: 24px;
                 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
             #top-navbar::before { border-radius: 24px; }
             #top-navbar .nav-links a.desktop-only { display: none; }
@@ -480,66 +481,229 @@
                 justify-content: space-evenly;
                 gap: 2px;
                 padding-right: 6px;
+                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
             #top-navbar .nav-links a.mobile-only {
                 display: inline-flex;
                 font-size: 14px;
                 padding: 8px 10px;
+                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
             #top-navbar .nav-actions {
                 display: flex;
                 margin-right: 0;
                 gap: 6px;
+                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
             #top-navbar .nav-actions .nav-circle-btn {
                 width: 34px;
                 height: 34px;
                 font-size: 16px;
+                transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            }
+
+            /* 背诵模式下的沉浸式导航栏 */
+            #top-navbar.immersive-mode {
+                width: 48px !important;
+                min-width: 48px !important;
+                height: 48px !important;
+                padding: 0 !important;
+                left: calc(16px + env(safe-area-inset-left)) !important;
+                transform: none !important;
+                border-radius: 24px !important;
+                background: rgba(255, 255, 255, 0.25) !important;
+                backdrop-filter: saturate(180%) blur(20px) !important;
+                -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+                cursor: pointer;
+                overflow: hidden;
+                animation: immersive-pulse 3s ease-in-out infinite;
+            }
+
+            @keyframes immersive-pulse {
+                0%, 100% { 
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                }
+                50% { 
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(255, 255, 255, 0.3);
+                }
+            }
+
+            #top-navbar.immersive-mode .nav-brand {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                margin: 0 !important;
+                font-size: 18px !important;
+                z-index: 10;
+            }
+
+            #top-navbar.immersive-mode .nav-links,
+            #top-navbar.immersive-mode .nav-actions {
+                opacity: 0;
+                pointer-events: none;
+                transform: translateX(-20px);
+            }
+
+            /* 展开状态 */
+            #top-navbar.immersive-mode.expanded {
+                width: min(1240px, calc(94vw - 32px - env(safe-area-inset-left))) !important;
+                min-width: min(1240px, calc(94vw - 32px - env(safe-area-inset-left))) !important;
+                height: auto !important;
+                padding: 10px 16px !important;
+                background: rgba(255, 255, 255, 0.15) !important;
+                cursor: default;
+                animation: none !important;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+            }
+
+            #top-navbar.immersive-mode.expanded .nav-brand {
+                position: static;
+                transform: none;
+                margin-left: 0 !important;
+                font-size: 16px !important;
+            }
+
+            #top-navbar.immersive-mode.expanded .nav-links,
+            #top-navbar.immersive-mode.expanded .nav-actions {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateX(0);
+            }
+
+            /* 夜间模式适配 */
+            body.dark-mode #top-navbar.immersive-mode {
+                background: rgba(28, 28, 30, 0.4) !important;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            @keyframes immersive-pulse-dark {
+                0%, 100% { 
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                }
+                50% { 
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.15);
+                }
+            }
+
+            body.dark-mode #top-navbar.immersive-mode {
+                animation: immersive-pulse-dark 3s ease-in-out infinite;
+            }
+
+            body.dark-mode #top-navbar.immersive-mode.expanded {
+                background: rgba(28, 28, 30, 0.3) !important;
+                animation: none !important;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -1px 1px rgba(0, 0, 0, 0.4) !important;
             }
         }
         @media (max-width: 600px) {
             #bottom-tab-bar { display: none; }
             #main-area {
-                /* 新增：取消强制垂直居中，让内容向上对齐 */
-                align-items: flex-start !important; 
+                /* 移动端：保持卡片在上部，但容器底部下沉 */
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: flex-start !important; /* 卡片保持在上部 */
+                align-items: center !important;
                 
-                /* 下面的保持原样 */
-                min-height: calc(100vh - 85px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
-                padding-top: calc(85px + env(safe-area-inset-top));
-                padding-bottom: env(safe-area-inset-bottom);
+                /* 保持原来的上部位置 */
+                min-height: calc(100vh - 60px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+                padding-top: calc(60px + env(safe-area-inset-top));
+                padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* 底部精准悬浮 */
             }
-            /* 卡片左右留出安全距离，同时增加顶部间距 */
+            
+            /* 背诵模式下进一步优化空间利用 */
+            body.flashcard-immersive #main-area {
+                padding-top: calc(15px + env(safe-area-inset-top)) !important;
+                min-height: calc(100vh - 15px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom)) !important;
+                padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important; /* 保持精准悬浮 */
+            }
+            
+            /* 恢复卡片的顶部间距，保持原来的位置 */
             #flashcard-wrapper { 
                 width: calc(100vw - 48px); 
                 max-width: 420px; 
-                margin-top: 20px; /* 新增：距离导航栏 20px */
+                margin-top: 15px; /* 恢复顶部间距 */
+                margin-bottom: 0; /* 确保没有底部间距 */
+                transition: margin-top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
+            
+            /* 背诵模式下减少顶部间距 */
+            body.flashcard-immersive #flashcard-wrapper {
+                margin-top: 8px !important;
+                margin-bottom: 0 !important;
+            }
+            
             #welcome-screen { 
                 width: calc(100vw - 48px) !important; 
                 max-width: 420px !important; 
-                margin-top: 20px; /* 新增：首页卡片也同步上移 */
+                margin-top: 20px; /* 首页卡片保持原有间距 */
             }
+            
+            /* 移动端卡片固定高度布局 - 增加高度以适应底部下沉 */
             .card-container { 
                 width: 100%; 
                 padding: 24px 18px; 
                 border-radius: 28px;
-                max-height: calc(100vh - 120px - var(--safe-area-inset-top) - var(--safe-area-inset-bottom));
-                overflow-y: auto;
-                min-height: auto;
+                height: 75dvh; /* 增加高度以适应底部下沉 */
+                display: flex;
+                flex-direction: column;
+                overflow: hidden; /* 防止内容溢出 */
             }
+            
+            /* 背诵模式下卡片优化 */
+            body.flashcard-immersive .card-container {
+                height: 80dvh !important; /* 沉浸式模式下进一步增加高度 */
+                padding: 28px 20px !important;
+            }
+            
             #flashcard-screen h1 { font-size: 36px; }
-            #meaning { font-size: 16px; min-height: 80px; padding: 16px; margin-bottom: 20px; }
+            
+            /* 移动端释义区域弹性化 */
+            #meaning { 
+                font-size: 16px; 
+                min-height: auto; /* 移除固定最小高度 */
+                padding: 16px; 
+                margin-bottom: 20px; 
+                flex: 1 1 0%; /* 强制只在剩余空间内伸缩 */
+                overflow-y: auto; /* 内容过多时内部滚动 */
+                -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+                display: flex !important; /* 确保使用 flex 布局 */
+                align-items: center !important; /* 垂直居中 */
+                justify-content: center !important; /* 水平居中 */
+                text-align: center !important; /* 文本居中 */
+            }
+
+            /* 移动端释义内容展开后的样式 */
+            #meaning.expanded {
+                display: block !important; /* 改为 block 布局 */
+                text-align: left !important; /* 文本左对齐 */
+                align-items: flex-start !important; /* 顶部对齐 */
+                justify-content: flex-start !important; /* 左对齐 */
+            }
+            
+            /* 移动端按钮区域固定在底部 */
+            #controls {
+                margin-top: auto !important; /* 关键：将按钮推到最底部 */
+                flex-shrink: 0; /* 防止按钮区域被压缩 */
+            }
+            
+            /* 背诵模式下释义区域进一步优化 */
+            body.flashcard-immersive #meaning {
+                padding: 20px !important;
+                margin-bottom: 24px !important;
+            }
         }
 
         #welcome-screen h1 { color: var(--primary-color); font-size: 36px; margin-bottom: 10px; transition: color 0.3s; font-weight: 800; letter-spacing: -0.02em;}
         #welcome-screen p { color: #86868b; font-size: 16px; margin-bottom: 30px; line-height: 1.6; font-weight: 500;}
         .highlight-text { color: var(--primary-color); font-weight: 700; font-size: 18px; }
-        #stats { font-size: 14px; color: var(--primary-dark); margin-bottom: 15px; font-weight: 700; background: rgba(255,255,255,0.4); padding: 4px 12px; border-radius: 12px; display: inline-block; align-self: center;}
+        #stats { font-size: 14px; color: var(--primary-dark); margin-bottom: 15px; font-weight: 700; background: rgba(255,255,255,0.4); padding: 4px 12px; border-radius: 12px; display: inline-block; align-self: center; flex-shrink: 0; /* 防止统计信息被压缩 */ }
         
         /* 单词与音标高级排版 */
-        #flashcard-screen h1 { color: #1d1d1f; font-size: 48px; font-weight: 800; margin: 10px 0 8px; letter-spacing: -0.03em; transition: color 0.3s;}
+        #flashcard-screen h1 { color: #1d1d1f; font-size: 48px; font-weight: 800; margin: 10px 0 8px; letter-spacing: -0.03em; transition: color 0.3s; flex-shrink: 0; /* 防止标题被压缩 */ }
         
-        #phonetic-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; min-height: 24px; flex-wrap: wrap; }
+        #phonetic-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 24px; min-height: 24px; flex-wrap: wrap; flex-shrink: 0; /* 防止音标区域被压缩 */ }
         #phonetic { color: #86868b; font-size: 18px; font-weight: 500;}
         
         .pos-badge { background: var(--primary-light); color: white; padding: 2px 8px; border-radius: 6px; font-size: 13px; font-weight: bold; display: inline-block; }
@@ -552,6 +716,7 @@
             -webkit-appearance: none; appearance: none;
             text-align: center;
             background-image: none;
+            flex-shrink: 0; /* 防止分类标签被压缩 */
         }
         /* 用 wrapper 做箭头，避免 SVG 颜色硬编码问题 */
         #category-badge-wrapper {
@@ -560,6 +725,7 @@
             align-items: center;
             align-self: center;
             margin-bottom: 15px;
+            flex-shrink: 0; /* 防止分类区域被压缩 */
         }
         #category-badge-wrapper::after {
             content: '';
@@ -596,8 +762,21 @@
             -webkit-backdrop-filter: blur(10px);
             border-radius: 20px; border: 1px solid rgba(255,255,255,0.4); 
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.03); 
-            display: flex; align-items: center; justify-content: center; 
             white-space: pre-wrap; overflow-y: auto; transition: all 0.3s ease; 
+            flex: 1 1 0%; /* 强制只在剩余空间内伸缩，不撑开父级 */
+            display: flex; /* 使用 flex 布局来控制对齐 */
+            align-items: center; /* 垂直居中 */
+            justify-content: center; /* 水平居中 */
+            text-align: center; /* 文本居中 */
+            -webkit-overflow-scrolling: touch; /* iOS 平滑滚动 */
+        }
+
+        /* 当释义内容展开后，改为左对齐和顶部对齐 */
+        #meaning.expanded {
+            display: block !important; /* 改为 block 布局 */
+            text-align: left !important; /* 文本左对齐 */
+            align-items: flex-start !important; /* 顶部对齐 */
+            justify-content: flex-start !important; /* 左对齐 */
         }
 
         #list-title { color: #1d1d1f; font-size: 24px; font-weight: 700; margin-top: 0; margin-bottom: 15px; text-align: center; transition: color 0.3s;}
@@ -663,7 +842,13 @@
         }
         button:active { transform: scale(0.96); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
         
-        #controls { display: none; grid-template-columns: 1fr 1fr; gap: 12px; }
+        #controls { 
+            display: none; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            flex-shrink: 0; /* 防止按钮区域被压缩 */ 
+            margin-top: auto; /* 确保按钮始终在底部 */
+        }
 
         .category-selector-container { padding: 15px 25px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: border-color 0.3s; }
         #category-select, #theme-select { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); color: #1d1d1f; font-size: 14px; outline: none; transition: all 0.3s; background: rgba(255,255,255,0.8); font-weight: 500;}
@@ -1151,12 +1336,12 @@
     </div>
 
     <nav id="top-navbar">
-        <a class="nav-brand" href="https://github.com/kinsung97/VocabFlash" target="_blank" title="雅思词汇闪卡 - 一个简洁优雅的雅思词汇学习工具" style="text-decoration:none; display:inline-flex; align-items:center; gap:7px;">
+        <div class="nav-brand" style="display:inline-flex; align-items:center; gap:7px;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
             </svg>
             <span class="brand-text">VocabFlash</span>
-        </a>
+        </div>
         <div class="nav-links">
             <a class="desktop-only" href="#" onclick="switchView('flashcard-screen')">背诵</a>
             <a class="desktop-only" href="#" onclick="showList('learned')">已背</a>
@@ -1242,7 +1427,7 @@
                 <span id="phonetic"></span>
                 <div id="pos-container" style="display: flex; gap: 5px;"></div>
             </div>
-            <button onclick="speakCurrentWord()" style="background: rgba(0,0,0,0.04); color: var(--primary-color); padding: 8px 20px; font-size: 13px; font-weight: 600; margin-bottom: 24px; width: auto; box-shadow: none; border: 1px solid rgba(0,0,0,0.05); align-self: center;">🔊 再次发音</button>
+            <button onclick="speakCurrentWord()" style="background: rgba(0,0,0,0.04); color: var(--primary-color); padding: 8px 20px; font-size: 13px; font-weight: 600; margin-bottom: 24px; width: auto; box-shadow: none; border: 1px solid rgba(0,0,0,0.05); align-self: center; flex-shrink: 0;">🔊 再次发音</button>
             <div id="meaning">点击看释义</div>
             <div id="controls">
                 <button onclick="handleRate(1)" class="rate-btn rate-1">生疏 (1天)</button>
@@ -1614,6 +1799,27 @@
             document.getElementById('list-screen').style.display = 'none';
             document.getElementById('status-screen').style.display = 'none';
             document.getElementById('settings-screen').style.display = 'none';
+            
+            // 控制沉浸式导航栏
+            const navbar = document.getElementById('top-navbar');
+            const isFlashcardView = viewId === 'flashcard-screen';
+            const isMobile = window.innerWidth <= 800;
+            
+            // 移除或添加沉浸式body类
+            document.body.classList.toggle('flashcard-immersive', isFlashcardView && isMobile);
+            
+            if (isFlashcardView && isMobile) {
+                navbar.classList.add('immersive-mode');
+                // 添加点击事件来展开/收缩导航栏
+                navbar.onclick = toggleNavbarExpansion;
+                // 添加点击外部区域收缩的监听
+                document.addEventListener('click', handleOutsideClick);
+            } else {
+                navbar.classList.remove('immersive-mode', 'expanded');
+                navbar.onclick = null;
+                document.removeEventListener('click', handleOutsideClick);
+            }
+            
             if (viewId === 'flashcard-screen') {
                 document.getElementById('flashcard-wrapper').style.display = 'flex';
                 document.getElementById('flashcard-screen').style.display = 'flex';
@@ -1640,6 +1846,45 @@
                 });
             }
         }
+
+        // 导航栏展开/收缩控制
+        function toggleNavbarExpansion(event) {
+            event.stopPropagation();
+            const navbar = document.getElementById('top-navbar');
+            if (navbar.classList.contains('immersive-mode')) {
+                navbar.classList.toggle('expanded');
+            }
+        }
+
+        // 点击外部区域收缩导航栏
+        function handleOutsideClick(event) {
+            const navbar = document.getElementById('top-navbar');
+            if (!navbar.contains(event.target) && navbar.classList.contains('expanded')) {
+                navbar.classList.remove('expanded');
+            }
+        }
+
+        // 监听窗口大小变化，自动调整导航栏模式
+        window.addEventListener('resize', function() {
+            const navbar = document.getElementById('top-navbar');
+            const isFlashcardView = document.getElementById('flashcard-screen').style.display === 'flex';
+            const isMobile = window.innerWidth <= 800;
+            
+            // 更新沉浸式body类
+            document.body.classList.toggle('flashcard-immersive', isFlashcardView && isMobile);
+            
+            if (isFlashcardView && isMobile) {
+                if (!navbar.classList.contains('immersive-mode')) {
+                    navbar.classList.add('immersive-mode');
+                    navbar.onclick = toggleNavbarExpansion;
+                    document.addEventListener('click', handleOutsideClick);
+                }
+            } else {
+                navbar.classList.remove('immersive-mode', 'expanded');
+                navbar.onclick = null;
+                document.removeEventListener('click', handleOutsideClick);
+            }
+        });
 
         function enterApp() { switchView('flashcard-screen'); }
 
@@ -2041,6 +2286,10 @@
 
             document.getElementById('meaning').innerText = "点击看释义"; 
             document.getElementById('meaning').style.color = document.body.classList.contains('dark-mode') ? "#86868b" : "#86868b";
+            // 移除 expanded 类，恢复居中显示
+            document.getElementById('meaning').classList.remove('expanded');
+            // 重置滚动位置到顶部
+            document.getElementById('meaning').scrollTop = 0;
             document.getElementById('start-btn').style.display = 'none'; document.getElementById('controls').style.display = 'grid';
 
             updateFavoriteButton();
@@ -2049,6 +2298,10 @@
             document.getElementById('meaning').onclick = function() {
                 this.innerText = currentWord.meaning + (currentWord.example ? "\n\n" + currentWord.example : ""); 
                 this.style.color = document.body.classList.contains('dark-mode') ? "#dcdde1" : "#424245";
+                // 添加 expanded 类来改变布局
+                this.classList.add('expanded');
+                // 确保滚动条处于最上方，让用户看到内容的开头
+                this.scrollTop = 0;
             };
         }
 
