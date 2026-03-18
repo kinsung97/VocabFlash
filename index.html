@@ -260,6 +260,34 @@
         }
 
         /* =========================================
+           锁定全屏滑动 (消除卡片乱动)
+           ========================================= */
+        /* 背诵模式下锁定页面滚动 */
+        body.flashcard-immersive html,
+        body.flashcard-immersive body {
+            overflow: hidden !important;
+            touch-action: none !important;
+            position: fixed !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* 仅允许卡片容器内部滚动 */
+        body.flashcard-immersive .card-container {
+            touch-action: pan-y !important;
+        }
+
+        /* 仅允许释义区域滚动 */
+        body.flashcard-immersive #meaning {
+            touch-action: pan-y !important;
+        }
+
+        /* 确保导航栏在锁定模式下仍可交互 */
+        body.flashcard-immersive #top-navbar {
+            touch-action: manipulation !important;
+        }
+
+        /* =========================================
            桌面端：顶级液态玻璃悬浮导航栏 (Apple-Style)
            ========================================= */
         #top-navbar {
@@ -518,6 +546,8 @@
                 cursor: pointer;
                 overflow: hidden;
                 animation: immersive-pulse 3s ease-in-out infinite;
+                will-change: width, transform; /* 硬件加速优化 */
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); /* 苹果系统级平滑曲线 */
             }
 
             @keyframes immersive-pulse {
@@ -537,6 +567,7 @@
                 margin: 0 !important;
                 font-size: 18px !important;
                 z-index: 10;
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
             #top-navbar.immersive-mode .nav-links,
@@ -544,6 +575,7 @@
                 opacity: 0;
                 pointer-events: none;
                 transform: translateX(-20px);
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
             /* 展开状态 */
@@ -565,11 +597,13 @@
                 font-size: 16px !important;
             }
 
+            /* 内容渐显：延迟显示，防止挤压闪烁 */
             #top-navbar.immersive-mode.expanded .nav-links,
             #top-navbar.immersive-mode.expanded .nav-actions {
                 opacity: 1;
                 pointer-events: auto;
                 transform: translateX(0);
+                transition-delay: 0.2s; /* 延迟显示，等宽度展开后再显示内容 */
             }
 
             /* 夜间模式适配 */
