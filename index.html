@@ -592,16 +592,12 @@
 
         #status-screen {
             display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
             width: 100% !important;
             max-width: none;
             padding: 0 !important;
             text-align: left;
-            overflow-y: auto;
             background: transparent;
             z-index: 5;
-            -ms-overflow-style: none; scrollbar-width: none;
         }
         #status-screen::-webkit-scrollbar { display: none; }
         #status-content-wrapper { 
@@ -898,7 +894,6 @@
         /* 1. 解放容器：全屏固定覆盖，完全脱离 main-area 的裁剪限制 */
         #list-screen {
             display: none;
-            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             width: 100% !important;
             max-width: none !important;
@@ -906,8 +901,6 @@
             margin: 0 !important;
             background: transparent;
             z-index: 5;
-            overflow-y: auto;
-            -ms-overflow-style: none; scrollbar-width: none;
         }
         #list-screen::-webkit-scrollbar { display: none; }
 
